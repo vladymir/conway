@@ -1,7 +1,6 @@
 # conway
 
-A Clojure library designed to ... well, that part is up to you.
-
+Cellular Automata game of life by Conway in clojure.
 ## Usage
 
 FIXME
