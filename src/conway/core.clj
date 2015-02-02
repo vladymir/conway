@@ -12,4 +12,8 @@
         (and (> line 0) (< line (- height 1)) (> column 0) (< column (- width 1)))
             (for [x (range (- line 1) (+ line 2))] 
                 [x (+ column 1)])
+        (= column (- width 1)) ;[[5 5] [0 0] [1 0]]
+            (cond (= line 0) [[height 0] [0 0] [1 0]]
+                  (= line (- height 1)) [[(- height 1) 0] [height 0] [0 0]]
+            ) 
         ))
