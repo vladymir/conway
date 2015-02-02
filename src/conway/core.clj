@@ -9,11 +9,14 @@
 
 (defn right-of [line column height width]
     (cond
-        (and (> line 0) (< line (- height 1)) (> column 0) (< column (- width 1)))
+        (and (> line 0) (< line (dec height)) (> column 0) (< column (dec width)))
             (for [x (range (- line 1) (+ line 2))] 
                 [x (+ column 1)])
-        (= column (- width 1)) ;[[5 5] [0 0] [1 0]]
-            (cond (= line 0) [[height 0] [0 0] [1 0]]
-                  (= line (- height 1)) [[(- height 1) 0] [height 0] [0 0]]
+        (= column (dec width)) 
+            (cond (= line 0) [[(dec height) 0] [0 0] [1 0]]
+                  (= line (dec height)) [[(dec (dec height)) 0] [(dec height) 0] [0 0]]
+                  :else
+                    (for [x (range (dec line) (inc (inc line)))] 
+                        [x 0])
             ) 
         ))
