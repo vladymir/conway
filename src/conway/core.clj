@@ -4,7 +4,7 @@
     (if (< (rand 100) 25) 1 0))
 
 (defn make-grid [size]
-    (into [] (for [c (range size)] 
+    (into [] (for [c (range size)]
         (into [] (for [r (range size)] (randomize))))))
 
 
@@ -35,8 +35,6 @@
                                    above-of 
                                    below-of) line column)))))
 
-
-
 (defn make-bounds [size]
     (fn [x] (cond (< x 0)    (- size 1)
                   (= x size)  0
@@ -56,8 +54,15 @@
 
 (defn make-neighbours-count [size world]
     (into [] (for [c (range size)]
-        (into [] (for [r (range size)] (count-neighbours c r world))))))
+        (into [] (for [r (range size)]
+            (count-neighbours c r world))))))
 
+(defn conway-rules [[counter cell]]
+    (cond (= cell 0) (if   (= counter 3) 1)
+          (= cell 1) (cond (< counter 2) 0
+                           (or (= counter 2)
+                               (= counter 3)) 1
+                           (> counter 3) 0)))
 
 (defn myfoldL [operation p_seq]
     (loop [acc 0 s p_seq ]
