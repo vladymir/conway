@@ -35,26 +35,29 @@
                                    above-of 
                                    below-of) line column)))))
 
-(defn count-neighbours [line column world]
-    (count (filter #(= 1 %) 
-        (map #(get-cell % world) 
-            (normalize (neighbours line column) (count world))))))
 
-(defn make-neighbours-count [size world]
-    (into [] (for [c (range size)] 
-        (into [] (for [r (range size)] (count-neighbours c r world))))))
 
 (defn make-bounds [size]
     (fn [x] (cond (< x 0)    (- size 1)
                   (= x size)  0
                   :else       x)))
 
-(defn get-cell [[line column] matrix]
-    (nth (nth matrix line) column))
-
 (defn normalize [neighbours size]
     (let [bounds (make-bounds size)] 
         (map #(map bounds %) neighbours)))
+
+(defn get-cell [[line column] matrix]
+    (nth (nth matrix line) column))
+
+(defn count-neighbours [line column world]
+    (count (filter #(= 1 %)
+        (map #(get-cell % world)
+            (normalize (neighbours line column) (count world))))))
+
+(defn make-neighbours-count [size world]
+    (into [] (for [c (range size)]
+        (into [] (for [r (range size)] (count-neighbours c r world))))))
+
 
 (defn myfoldL [operation p_seq]
     (loop [acc 0 s p_seq ]
