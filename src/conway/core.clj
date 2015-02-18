@@ -1,4 +1,5 @@
-(ns conway.core)
+(ns conway.core (:use clojure.pprint))
+(use '[clojure.java.shell :only [sh]])
 
 (defn randomize []
     (if (< (rand 100) 25) 1 0))
@@ -61,7 +62,7 @@
     (cond (= cell 1) true 
           (= cell 0) false))
 
-(defn conway-rules [[counter cell]]
+(defn conway-rules [[cell counter]]
     (cond (not (is-alive? cell)) 
                 (if (= counter 3) 1 0)
           (is-alive? cell) 
@@ -74,6 +75,24 @@
     (for [l (range (count world))]
         (for [c (range (count world))]
             [(get-cell [l c] world), (get-cell [l c] counter-matrix)])))
+
+(defn generate-offspring [world counters]
+    (map #(map conway-rules %) (generate-pairs world counters)))
+
+(defn main [world counters]
+    (let [size (count world)
+          next-offspring (generate-offspring world counters)
+          counters       (make-neighbours-count size next-offspring)]
+          (do (pprint (:out (pprint world))) 
+                 (print (:out (sh "clear")))
+                 (Thread/sleep 50))
+          (recur next-offspring counters)))
+
+(defn -main [arg]
+    (let [size (Integer. arg)
+          world (make-grid size)
+          counters (make-neighbours-count (count world) world)]
+          (main world counters)))   
 
 (defn myfoldL [operation p_seq]
     (loop [acc 0 s p_seq ]
