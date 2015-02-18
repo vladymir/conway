@@ -57,12 +57,23 @@
         (into [] (for [r (range size)]
             (count-neighbours c r world))))))
 
+(defn is-alive? [cell]
+    (cond (= cell 1) true 
+          (= cell 0) false))
+
 (defn conway-rules [[counter cell]]
-    (cond (= cell 0) (if   (= counter 3) 1)
-          (= cell 1) (cond (< counter 2) 0
-                           (or (= counter 2)
-                               (= counter 3)) 1
-                           (> counter 3) 0)))
+    (cond (not (is-alive? cell)) 
+                (if (= counter 3) 1 0)
+          (is-alive? cell) 
+                (cond (or (< counter 2)
+                          (> counter 3)) 0
+                      (or (= counter 2)
+                          (= counter 3)) 1)))
+
+(defn generate-pairs [world counter-matrix]
+    (for [l (range (count world))]
+        (for [c (range (count world))]
+            [(get-cell [l c] world), (get-cell [l c] counter-matrix)])))
 
 (defn myfoldL [operation p_seq]
     (loop [acc 0 s p_seq ]
