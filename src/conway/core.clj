@@ -79,20 +79,19 @@
 (defn generate-offspring [world counters]
     (map #(map conway-rules %) (generate-pairs world counters)))
 
-(defn main [world counters]
-    (let [size (count world)
-          next-offspring (generate-offspring world counters)
-          counters       (make-neighbours-count size next-offspring)]
+(defn main [world counters size]
+    (let [next-offspring (generate-offspring world counters)
+          counters (make-neighbours-count size next-offspring)]
           (do (pprint (:out (pprint world))) 
-                 (print (:out (sh "clear")))
-                 (Thread/sleep 50))
-          (recur next-offspring counters)))
+              (print  (:out (sh "clear")))
+              (Thread/sleep 50))
+          (recur next-offspring counters size)))
 
 (defn -main [arg]
     (let [size (Integer. arg)
           world (make-grid size)
           counters (make-neighbours-count (count world) world)]
-          (main world counters)))   
+          (main world counters size)))   
 
 (defn myfoldL [operation p_seq]
     (loop [acc 0 s p_seq ]
