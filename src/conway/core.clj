@@ -1,5 +1,6 @@
 (ns conway.core (:use clojure.pprint))
 (use '[clojure.java.shell :only [sh]])
+(require '[clojure.string :as str])
 
 (defn randomize []
     (if (< (rand 100) 25) 1 0))
@@ -17,24 +18,24 @@
     (for [x (range (- column 1) (+ column 2))] 
         [(func line 1) x]))
 
-(defn left-of [line column] 
+(defn left [line column] 
     (vertical line column -))
 
-(defn right-of [line column]
+(defn right [line column]
     (vertical line column +))
 
-(defn above-of [line column]
+(defn up [line column]
     (horizontal line column -))
 
-(defn below-of [line column]
+(defn down [line column]
     (horizontal line column +))
 
 (defn neighbours [line column]
     (into [] 
-        (set (mapcat concat ((juxt left-of 
-                                   right-of 
-                                   above-of 
-                                   below-of) line column)))))
+        (set (mapcat concat ((juxt left 
+                                   right 
+                                   up 
+                                   down) line column)))))
 
 (defn make-bounds [size]
     (fn [x] (cond (< x 0)    (- size 1)
@@ -79,19 +80,27 @@
 (defn generate-offspring [world counters]
     (map #(map conway-rules %) (generate-pairs world counters)))
 
-(defn main [world counters size]
-    (let [next-offspring (generate-offspring world counters)
-          counters (make-neighbours-count size next-offspring)]
-          (do (pprint (:out (pprint world))) 
-              (print  (:out (sh "clear")))
+
+(defn print_world [world]
+    (let [pre-world (map #(map (fn [x] (cond (= x 0) " "
+                                             (= x 1) "x"
+                                             :else nil)) %) world)]
+            (str/join "" (map #(println %) pre-world))))
+
+(defn main [world counters]
+    (let [size (count world)
+          next-offspring (generate-offspring world counters)
+          counters       (make-neighbours-count size next-offspring)]
+          (do (pprint (:out (print_world world)))
+              (print (:out (sh "clear")))
               (Thread/sleep 50))
-          (recur next-offspring counters size)))
+          (recur next-offspring counters)))
 
 (defn -main [arg]
     (let [size (Integer. arg)
           world (make-grid size)
           counters (make-neighbours-count (count world) world)]
-          (main world counters size)))   
+          (main world counters)))   
 
 (defn myfoldL [operation p_seq]
     (loop [acc 0 s p_seq ]
