@@ -11,14 +11,14 @@
 
 
 (defn vertical [line column func]
-    (for [x (range (- line 1) (+ line 2))] 
+    (for [x (range (- line 1) (+ line 2))]
         [x (func column 1)]))
 
 (defn horizontal [line column func]
-    (for [x (range (- column 1) (+ column 2))] 
+    (for [x (range (- column 1) (+ column 2))]
         [(func line 1) x]))
 
-(defn left [line column] 
+(defn left [line column]
     (vertical line column -))
 
 (defn right [line column]
@@ -31,10 +31,10 @@
     (horizontal line column +))
 
 (defn neighbours [line column]
-    (into [] 
-        (set (mapcat concat ((juxt left 
-                                   right 
-                                   up 
+    (into []
+        (set (mapcat concat ((juxt left
+                                   right
+                                   up
                                    down) line column)))))
 
 (defn make-bounds [size]
@@ -43,7 +43,7 @@
                   :else       x)))
 
 (defn normalize [neighbours size]
-    (let [bounds (make-bounds size)] 
+    (let [bounds (make-bounds size)]
         (map #(map bounds %) neighbours)))
 
 (defn get-cell [[line column] matrix]
@@ -60,22 +60,24 @@
             (count-neighbours c r world))))))
 
 (defn is-alive? [cell]
-    (cond (= cell 1) true 
+    (cond (= cell 1) true
           (= cell 0) false))
 
 (defn conway-rules [[cell counter]]
-    (cond (not (is-alive? cell)) 
+    (cond (not (is-alive? cell))
                 (if (= counter 3) 1 0)
-          (is-alive? cell) 
+          (is-alive? cell)
                 (cond (or (< counter 2)
                           (> counter 3)) 0
                       (or (= counter 2)
                           (= counter 3)) 1)))
 
 (defn generate-pairs [world counter-matrix]
-    (for [l (range (count world))]
-        (for [c (range (count world))]
-            [(get-cell [l c] world), (get-cell [l c] counter-matrix)])))
+    ;(for [l (range (count world))]
+    ;    (for [c (range (count world))]
+    ;        [(get-cell [l c] world), (get-cell [l c] counter-matrix)])))
+    (partition (count world)
+        (partition 2 (flatten (map interleave world counter-matrix)))))
 
 (defn generate-offspring [world counters]
     (map #(map conway-rules %) (generate-pairs world counters)))
@@ -83,7 +85,7 @@
 
 (defn print_world [world]
     (let [pre-world (map #(map (fn [x] (cond (= x 0) " "
-                                             (= x 1) "x"
+                                             (= x 1) "*"
                                              :else nil)) %) world)]
             (str/join "" (map #(println %) pre-world))))
 
@@ -100,7 +102,7 @@
     (let [size (Integer. arg)
           world (make-grid size)
           counters (make-neighbours-count (count world) world)]
-          (main world counters)))   
+            (main world counters)))
 
 (defn myfoldL [operation p_seq]
     (loop [acc 0 s p_seq ]
