@@ -31,11 +31,7 @@
     (horizontal line column +))
 
 (defn neighbours [line column]
-    (into []
-        (set (mapcat concat ((juxt left
-                                   right
-                                   up
-                                   down) line column)))))
+  (distinct (reduce concat ((juxt left right up down) line column))))
 
 (defn make-bounds [size]
     (fn [x] (cond (< x 0)    (- size 1)
@@ -73,29 +69,39 @@
                           (= counter 3)) 1)))
 
 (defn generate-pairs [world counter-matrix]
-    ;(for [l (range (count world))]
+    ;#1(for [l (range (count world))]
     ;    (for [c (range (count world))]
     ;        [(get-cell [l c] world), (get-cell [l c] counter-matrix)])))
-    (partition (count world)
-        (partition 2 (flatten (map interleave world counter-matrix)))))
+    ;#2(partition (count world)
+    ;    (partition 2 (flatten (map interleave world counter-matrix)))))
+    (->> (map interleave world counter-matrix)
+         flatten
+         (partition 2)
+         (partition (count world))))
+
+(defn apply-conway-rules [cells]
+    (map conway-rules cells))
 
 (defn generate-offspring [world counters]
-    (map #(map conway-rules %) (generate-pairs world counters)))
+    (let [pairs (generate-pairs world counters)]
+      (map apply-conway-rules pairs)))
 
+(defn replace-numbers-to-chars [numbers]
+    (map (fn [x] (cond (= x 0) " "
+                       (= x 1) "*"
+                       :else nil)) numbers))
 
 (defn print_world [world]
-    (let [pre-world (map #(map (fn [x] (cond (= x 0) " "
-                                             (= x 1) "*"
-                                             :else nil)) %) world)]
-            (str/join "" (map #(println %) pre-world))))
+    (let [pre-world (map replace-numbers-to-chars world)]
+            (str/join "" (map println pre-world))))
 
 (defn main [world counters]
     (let [size (count world)
           next-offspring (generate-offspring world counters)
           counters       (make-neighbours-count size next-offspring)]
           (do (pprint (:out (print_world world)))
-              (print (:out (sh "clear")))
-              (Thread/sleep 50))
+              (print (:out (sh "clear"))))
+              ;(Thread/sleep 50))
           (recur next-offspring counters)))
 
 (defn -main [arg]

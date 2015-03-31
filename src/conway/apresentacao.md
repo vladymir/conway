@@ -43,3 +43,15 @@
       + Objeto -> Dados com comportamento
       + Closure -> Comportamento com dados
       
+
+* Linguagens imperativas são baseadas em sequencia de comandos
+* Linguagens funcionais são baseadas em chamadas de funções aninhadas
+
+* Em linguagens imperativas, um mesmo nome (variável) pode estar associada a diversos valores, em linguagens funcionais um nome é associado a um unico valor.
+
+* Linguagens imperativas tem uma ordem de avaliação fixada. Em linguagens funcionais não necessariamente.
+
+* Em linguagens imperativas novos valores podem ser associados com o mesmo nome através de repetições de comandos enquanto que em linguagens funcionais novos nomes são associados com novos valores através de chamadas recursivas.
+
+* Em linguagens funcionais, funções são valores.
+
