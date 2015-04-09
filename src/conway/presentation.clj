@@ -21,4 +21,7 @@
 	(map calculate-discount (get-values items) (get-discounts items) (get-qty items)))
 
 (defn finalize [items]
-	(reduce + (calculate-all items) ))
+	(reduce + (calculate-all items)))
+
+(defn discount-items [items]
+	(filter #(> (:discount %) 0) items))

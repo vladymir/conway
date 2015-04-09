@@ -1,14 +1,16 @@
-(ns conway.core (:use clojure.pprint))
+(ns conway.core (:use clojure.pprint)
+  (:require [clojure.math.combinatorics :as combo]))
 (use '[clojure.java.shell :only [sh]])
 (require '[clojure.string :as str])
+
 
 (defn randomize []
     (if (< (rand 100) 25) 1 0))
 
 (defn make-grid [size]
-    (into [] (for [c (range size)]
-        (into [] (for [r (range size)] (randomize))))))
-
+    ;(into [] (for [c (range size)]
+    ;    (into [] (for [r (range size)] (randomize))))))
+    (partition size (take (* size size) (repeatedly #(randomize)))))
 
 (defn vertical [line column func]
     (for [x (range (- line 1) (+ line 2))]
@@ -69,15 +71,8 @@
                           (= counter 3)) 1)))
 
 (defn generate-pairs [world counter-matrix]
-    ;#1(for [l (range (count world))]
-    ;    (for [c (range (count world))]
-    ;        [(get-cell [l c] world), (get-cell [l c] counter-matrix)])))
-    ;#2(partition (count world)
-    ;    (partition 2 (flatten (map interleave world counter-matrix)))))
-    (->> (map interleave world counter-matrix)
-         flatten
-         (partition 2)
-         (partition (count world))))
+    (partition (count world)
+        (partition 2 (flatten (map interleave world counter-matrix)))))
 
 (defn apply-conway-rules [cells]
     (map conway-rules cells))
@@ -100,8 +95,8 @@
           next-offspring (generate-offspring world counters)
           counters       (make-neighbours-count size next-offspring)]
           (do (pprint (:out (print_world world)))
-              (print (:out (sh "clear"))))
-              ;(Thread/sleep 50))
+              (print (:out (sh "clear")))
+              (Thread/sleep 250))
           (recur next-offspring counters)))
 
 (defn -main [arg]
